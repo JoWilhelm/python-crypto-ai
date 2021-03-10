@@ -13,10 +13,9 @@ import math
 import os
 import os.path
 
-#api_key = 'ABC'
-#api_secret = '123'
-#polo = Poloniex(api_key, api_secret)
-polo = Poloniex()
+api_key = 'ABC'
+api_secret = '123'
+polo = Poloniex(api_key, api_secret)
 
 
 # gets dataframe from poloniex api
@@ -97,16 +96,16 @@ class Strategy():
         currentPrice = currentPrice("BTC")
         usd = float(polo.returnBalances()['USDT'])
         buyAmount = usd*tradingStrat.tradingPercentage/currentPrice
-        #polo.buy('USDT_BTC', currentPrice, buyAmount)
+        polo.buy('USDT_BTC', currentPrice, buyAmount)
         print("b @", round(currentPrice, 2))
     
     # places sell order
     def sell(self):
         #sell
         currentPrice = currentPrice("BTC")
-        btc = float(polo.returnBalances()['ETH'])
+        btc = float(polo.returnBalances()['BTC'])
         sellAmount = btc*tradingStrat.tradingPercentage
-        #polo.sell('USDT_BTC', current_price("BTC"), sellAmount)
+        polo.sell('USDT_BTC', current_price("BTC"), sellAmount)
         print("s @", round(currentPrice, 2))
     
 
