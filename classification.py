@@ -1,7 +1,7 @@
 import pandas as pd
 import numpy as np
 
-historicalDataPath = "HistoricalData.csv"
+historicalDataPath = "HistoricalData_2016_2023.csv"
 
 # looks |radius| candles ahead
 def classifyFuture(prices, radius, threshhold=0):
@@ -63,7 +63,8 @@ def convertToActionOrHold(targets):
 
 # build classification strategy here
 def classify(prices):
-    res = overlap([classifyFuture(prices, 20), classifyPastFuture(prices, 20)])
+    #res = overlap([classifyFuture(prices, 20), classifyPastFuture(prices, 20)])
+    res = classifyPastFuture(prices, 40, 0.0075)
     return res
 
 
@@ -77,4 +78,4 @@ main_df = main_df.replace([0.0], 0.0001)
 main_df["target"] = classify(main_df[f"BTC_close"])
 
 # to csv
-main_df.to_csv("HistoricalDataClassified.csv", index=False)
+main_df.to_csv("HistoricalDataClassified_2016_2023.csv", index=False)

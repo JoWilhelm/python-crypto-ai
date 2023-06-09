@@ -84,7 +84,8 @@ def convertToActionOrHold(targets):
 
 # build classification strategy here
 def classify(prices):
-    res = overlap([classifyFuture(prices, 20), classifyPastFuture(prices, 20)])
+    #res = overlap([classifyFuture(prices, 20), classifyPastFuture(prices, 20)])
+    res = classifyPastFuture(prices, 40, 0.0075)
     return res
 
 

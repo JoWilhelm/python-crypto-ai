@@ -15,6 +15,10 @@ SEQ_LEN = 240
 START = 1590969600 # 01.06.2020 dd.mm.yyyy
 END = 1591747200 # 10.06.2020
 
+START = 1680367767 # 01.04.2023
+END = 1685638000 # 01.06.2023
+
+
 
 def combine_dfs(list_dfs):
     df = pd.DataFrame()
@@ -64,8 +68,8 @@ class Strategy():
     model1 = tf.keras.models.load_model("r20t0-18.h5")
 
     
-    self.tradingPercentage = 0.10 #buy/sell percentage (of available balance)
-    self.pastConfs = deque(maxlen=300)
+    tradingPercentage = 0.20 #buy/sell percentage (of available balance)
+    pastConfs = deque(maxlen=300)
 
     def __init__(self, startingDollar, startingBtc):
         # wallet simulation
@@ -78,7 +82,7 @@ class Strategy():
         # only buy/sell if confidence higher than average
         self.pastConfs.append(prediction_model1[1])
         pastConfsAverage = np.mean(self.pastConfs) 
-        if prediction_model1[1] >= pastConfsAverage:
+        if prediction_model1[1] >= pastConfsAverage*1.01:
             return prediction_model1[0]
         else: 
             return 2
