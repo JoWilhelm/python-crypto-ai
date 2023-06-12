@@ -31,9 +31,38 @@ def combine_dfs(list_dfs):
     
 
 def get_ChartData(coin):
+    if END - START <= 129600:
+        return get_ChartData_interval(coin, START, END)
+    
+
+    # collect data in 1.5d intervals (the API doesn't allow larger requests)
+    intervalStart = START
+    intervalEnd = START + 129600 # +1.5d
+    intervalsCounter = 1
+
+    dataset = pd.DataFrame()
+    while(intervalEnd < END):
+        dataset = pd.concat([dataset, get_ChartData_interval(coin, intervalStart, intervalEnd)], ignore_index=True)
+        # shift interval 1.5d
+        intervalStart = intervalEnd
+        intervalEnd += 129600 # +1.5d
+        # counter
+        print("intervals: ", intervalsCounter, "/", int((END-START)/129600), " len dataset: ", len(dataset))
+
+        if intervalsCounter % 50 == 0:
+            time.sleep(60)
+        intervalsCounter += 1
+
+    intervalEnd = END
+    dataset = pd.concat([dataset, get_ChartData_interval(coin, intervalStart, intervalEnd)], ignore_index=True)
+    return dataset
+
+    
+
+def get_ChartData_interval(coin, intervalStart, intervalEnd):
     while True:
         try:
-            raw = polo.returnChartData(f"USDT_{coin}", 300, START, END)
+            raw = polo.returnChartData(f"USDT_{coin}", 300, intervalStart, intervalEnd)
         except:
             print("connection lost, trying again")
             time.sleep(60)
@@ -65,7 +94,7 @@ def buildSequence(df):
 
 class Strategy():
     # load model(-s)
-    model1 = tf.keras.models.load_model("r20t0-18.h5")
+    model1 = tf.keras.models.load_model("models/r40t075-08.h5")
 
     
     tradingPercentage = 0.20 #buy/sell percentage (of available balance)

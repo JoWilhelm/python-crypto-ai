@@ -11,12 +11,12 @@ polo = Poloniex()
 
 SEQ_LEN = 240
 # load model
-modelName = "r20t0-18"
-model = tf.keras.models.load_model(""+modelName+".h5")
+modelName = "r40t075-08"
+model = tf.keras.models.load_model("models/"+modelName+".h5")
 
 
-START = 1590969600 # 01.06.2020 dd.mm.yyyy
-END = 1591747200 # 10.06.2020
+START = 1680369000 # 01.04.2023 dd.mm.yyyy
+END = 1685640000 # 01.06.2023
 
 
 def combine_dfs(list_dfs):
@@ -27,12 +27,43 @@ def combine_dfs(list_dfs):
         else:
             df = df.join(list_df)
     return df
-    
+
+
+
 
 def get_ChartData(coin):
+    if END - START <= 129600:
+        return get_ChartData_interval(coin, START, END)
+    
+
+    # collect data in 1.5d intervals (the API doesn't allow larger requests)
+    intervalStart = START
+    intervalEnd = START + 129600 # +1.5d
+    intervalsCounter = 1
+
+    dataset = pd.DataFrame()
+    while(intervalEnd < END):
+        dataset = pd.concat([dataset, get_ChartData_interval(coin, intervalStart, intervalEnd)], ignore_index=True)
+        # shift interval 1.5d
+        intervalStart = intervalEnd
+        intervalEnd += 129600 # +1.5d
+        # counter
+        print("intervals: ", intervalsCounter, "/", int((END-START)/129600), " len dataset: ", len(dataset))
+
+        if intervalsCounter % 50 == 0:
+            time.sleep(60)
+        intervalsCounter += 1
+
+    intervalEnd = END
+    dataset = pd.concat([dataset, get_ChartData_interval(coin, intervalStart, intervalEnd)], ignore_index=True)
+    return dataset
+
+    
+
+def get_ChartData_interval(coin, intervalStart, intervalEnd):
     while True:
         try:
-            raw = polo.returnChartData(f"USDT_{coin}", 300, START, END)
+            raw = polo.returnChartData(f"USDT_{coin}", 300, intervalStart, intervalEnd)
         except:
             print("connection lost, trying again")
             time.sleep(60)
