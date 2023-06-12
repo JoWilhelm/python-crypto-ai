@@ -1,12 +1,13 @@
 import pandas as pd
 import numpy as np
+from tqdm import tqdm
 
 historicalDataPath = "HistoricalData_2016_2023.csv"
 
 # looks |radius| candles ahead
 def classifyFuture(prices, radius, threshhold=0):
     res = []
-    for i in range(0, len(prices) - radius):
+    for i in tqdm(range(0, len(prices) - radius)):
         pctChangeAvg = np.mean(prices[i+1:i+radius+1]) / prices[i];
         if pctChangeAvg >= 1 + threshhold:
             # future average price higher than current price, buy
@@ -28,7 +29,7 @@ def classifyPastFuture(prices, radius, threshhold=0):
     # fill start with zeros
     for i in range(0, radius):
         res.append(0)
-    for i in range(radius, len(prices) - radius):
+    for i in tqdm(range(radius, len(prices) - radius)):
         pctChangeAvg = np.mean(prices[i-radius-1:i+radius+1]) / prices[i];
         if pctChangeAvg >= 1 + threshhold:
             # average price higher than current price, buy
@@ -47,7 +48,7 @@ def classifyPastFuture(prices, radius, threshhold=0):
 # target only 1 or 0 if all agree, else 2 (hold)
 def overlap(targetArrays):
     res = []
-    for i in range(0, len(targetArrays[0])):
+    for i in tqdm(range(0, len(targetArrays[0]))):
         allEaqual = True
         for j in range(1, len(targetArrays)):
             if targetArrays[j][i] != targetArrays[0][i]:
@@ -63,19 +64,23 @@ def convertToActionOrHold(targets):
 
 # build classification strategy here
 def classify(prices):
+    res = overlap([classifyFuture(prices, 40, 0.0005), classifyPastFuture(prices, 40, 0.0005)])
     #res = overlap([classifyFuture(prices, 20), classifyPastFuture(prices, 20)])
-    res = classifyPastFuture(prices, 40, 0.0075)
+    #res = classifyPastFuture(prices, 40, 0.0075)
     return res
 
 
 
 # load DF
+print("loading df...")
 main_df = pd.read_csv(historicalDataPath)
+print("done")
 main_df.index = np.arange(0, len(main_df))
-main_df = main_df.replace([0.0], 0.0001)
+#main_df = main_df.replace([0.0], 0.0001)
 
 # classify every row
+print("classifying...")
 main_df["target"] = classify(main_df[f"BTC_close"])
 
 # to csv
-main_df.to_csv("HistoricalDataClassified_2016_2023.csv", index=False)
+main_df.to_csv("HistoricalDataClassified_2016_2023_ov40_th005.csv", index=False)
