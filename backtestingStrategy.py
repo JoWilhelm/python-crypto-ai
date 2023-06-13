@@ -7,6 +7,7 @@ import tensorflow as tf
 import matplotlib.pyplot as plt
 from tqdm import tqdm
 from collections import deque
+import seaborn as sns
 
 polo = Poloniex()
 
