@@ -2,13 +2,13 @@ import pandas as pd
 import numpy as np
 from tqdm import tqdm
 
-historicalDataPath = "data/HistoricalData_2016_2023.csv"
+historicalDataPath = "data/aligned/HistoricalData_2016_2023_300.csv"
 
 # looks |radius| candles ahead
 def classifyFuture(prices, radius, threshhold=0):
     res = []
     for i in tqdm(range(0, len(prices) - radius)):
-        pctChangeAvg = np.mean(prices[i+1:i+radius+1]) / prices[i];
+        pctChangeAvg = np.mean(prices[i+1:i+radius+1]) / prices[i]
         if pctChangeAvg >= 1 + threshhold:
             # future average price higher than current price, buy
             res.append(1)
@@ -30,7 +30,7 @@ def classifyPastFuture(prices, radius, threshhold=0):
     for i in range(0, radius):
         res.append(0)
     for i in tqdm(range(radius, len(prices) - radius)):
-        pctChangeAvg = np.mean(prices[i-radius-1:i+radius+1]) / prices[i];
+        pctChangeAvg = np.mean(prices[i-radius-1:i+radius+1]) / prices[i]
         if pctChangeAvg >= 1 + threshhold:
             # average price higher than current price, buy
             res.append(1)
@@ -84,4 +84,4 @@ print("classifying...")
 main_df["target"] = classify(main_df[f"BTC_close"])
 
 # to csv
-main_df.to_csv("data/HistoricalDataClassified_2016_2023_ov40_th04.csv", index=False)
+main_df.to_csv("data/aligned/HistoricalDataClassified_2016_2023_300_ov40_th04.csv", index=False)
