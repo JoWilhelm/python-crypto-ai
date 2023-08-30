@@ -27,17 +27,6 @@ def get_ChartData(coin, start, end):
     #print("len api response:", len(df))
     return df
 
-# can be used to combine historical data of multiple coins
-def combine_dfs(list_dfs):
-    df = pd.DataFrame()
-    for list_df in list_dfs:
-        if len(df) == 0:
-            df = list_df
-        else:
-            df = df.join(list_df)
-    return df
-    
-
 
 
 dataset = pd.DataFrame()
@@ -47,8 +36,7 @@ dataset = pd.DataFrame()
 
 
 
-# collect data in 30d intervals (the API doesn't allow larger requests)
-
+# collect data in 500 rows intervals (the API doesn't allow larger requests)
 intervalLength = 500*CANDLES_PERIOD
 intervalStart = START
 intervalEnd = START + intervalLength
