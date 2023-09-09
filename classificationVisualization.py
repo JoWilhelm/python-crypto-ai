@@ -1,61 +1,61 @@
 import time
-from poloniex import Poloniex
 import pandas as pd
 import numpy as np
 import matplotlib.pyplot as plt
 
-polo = Poloniex()
+
+START = 1580515200 # 01.02.2020
+END = 1583798400 # 10.03.2020
 
 
 
 
-
-def getPrices(coin):
-
-    START = 1580515200 # 01.02.2020
-    END = 1583798400 # 10.03.2020
-
-
-    # collect data in 1.5d intervals (the API doesn't allow larger requests)
-    intervalStart = START
-    intervalEnd = START + 129600 # +1.5d
-    intervalsCounter = 1
-    
-    
-    dataset = []
-    
-    while(intervalEnd < END):
-        dataset = np.append(dataset, getPrices_intv("BTC", intervalStart, intervalEnd))
-        # shift interval
-        intervalStart = intervalEnd
-        intervalEnd += 129600 # +1.5d
-        # counter
-        print("intervals: ", intervalsCounter, "/", int((END-START)/129600), " len dataset: ", len(dataset))
-        
-        if intervalsCounter % 50 == 0:
-            time.sleep(60)
-        intervalsCounter += 1
-    
-    intervalEnd = END
-    dataset = np.append(dataset, getPrices_intv("BTC", intervalStart, intervalEnd))
-
-    return dataset
-
-
-def getPrices_intv(coin, start, end):
-    while True:
-        try:
-            raw = polo.returnChartData(f"USDT_{coin}", 300, start, end)
-        except:
-            print("connection lost, trying again")
-            time.sleep(60)
-            pass
-        else:
-            # connected
-            break
-    df = pd.DataFrame(raw)
-    prices = df["close"].to_list()
-    return prices
+#def getPrices(coin):
+#
+#    START = 1580515200 # 01.02.2020
+#    END = 1583798400 # 10.03.2020
+#
+#
+#    # collect data in 1.5d intervals (the API doesn't allow larger requests)
+#    intervalStart = START
+#    intervalEnd = START + 129600 # +1.5d
+#    intervalsCounter = 1
+#    
+#    
+#    dataset = []
+#    
+#    while(intervalEnd < END):
+#        dataset = np.append(dataset, getPrices_intv("BTC", intervalStart, intervalEnd))
+#        # shift interval
+#        intervalStart = intervalEnd
+#        intervalEnd += 129600 # +1.5d
+#        # counter
+#        print("intervals: ", intervalsCounter, "/", int((END-START)/129600), " len dataset: ", len(dataset))
+#        
+#        if intervalsCounter % 50 == 0:
+#            time.sleep(60)
+#        intervalsCounter += 1
+#    
+#    intervalEnd = END
+#    dataset = np.append(dataset, getPrices_intv("BTC", intervalStart, intervalEnd))
+#
+#    return dataset
+#
+#
+#def getPrices_intv(coin, start, end):
+#    while True:
+#        try:
+#            raw = polo.returnChartData(f"USDT_{coin}", 300, start, end)
+#        except:
+#            print("connection lost, trying again")
+#            time.sleep(60)
+#            pass
+#        else:
+#            # connected
+#            break
+#    df = pd.DataFrame(raw)
+#    prices = df["close"].to_list()
+#    return prices
 
 
 # looks |radius| candles ahead
@@ -119,7 +119,7 @@ def convertToActionOrHold(targets):
 # build classification strategy here
 def classify(prices):
     res = overlap([classifyFuture(prices, 300, 0.005), classifyPastFuture(prices, 300, 0.005)])
-    #res = overlap([classifyFuture(prices, 40, 0.0005), classifyPastFuture(prices, 40, 0.0005)])
+    #res = overlap([classifyFuture(prices, 40, 0.0004), classifyPastFuture(prices, 40, 0.0004)])
     #res = overlap([classifyFuture(prices, 20), classifyPastFuture(prices, 20)])
     #res = classifyFuture(prices, 40, 0.0075)
     return res
@@ -127,6 +127,9 @@ def classify(prices):
 
 
 # load price data
+
+
+
 prices = getPrices("BTC")
 prices = [float(price) for price in prices]
 prices = [round(price, 2) for price in prices]
