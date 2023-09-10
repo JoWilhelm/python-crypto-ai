@@ -1,6 +1,5 @@
-from exchangeInterface.polosdk import RestClient
+from polosdk import RestClient
 import pandas as pd
-import plotly.graph_objects as go
 from datetime import datetime
 
 
