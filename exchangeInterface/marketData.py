@@ -40,7 +40,7 @@ def getHistoricalDataSingleRequest(pairing, start, end, candleIntv):
         columns = ['low', 'high', 'open', 'close', 'amount_quoteUnits', 'quantity_baseUnits', 'buyTakerAmount_quoteUnits', 'buyTakerQuantity_baseUnits', 'tradeCount', 'ts_recordPushed', 'weightedAverage', 'ts_startTime', 'ts_closeTime', 'dt_close']
     """
     # poloniex API request
-    response = client.markets().get_candles(pairing, candleIntv, start=start, end=end, limit=min(500, int((end-start)/candleIntvSeconds[candleIntv])))
+    response = client.markets().get_candles(pairing, candleIntv, start_time=start, end_time=end, limit=min(500, int((end-start)/candleIntvSeconds[candleIntv])))
     
     df = pd.DataFrame(response, columns=['low', 'high', 'open', 'close', 'amount_quoteUnits', 'quantity_baseUnits', 'buyTakerAmount_quoteUnits', 'buyTakerQuantity_baseUnits', 'tradeCount', 'ts_recordPushed', 'weightedAverage', 'interval', 'ts_openTime', 'ts_closeTime'])
     df.drop('interval', axis=1, inplace=True)
