@@ -1,5 +1,5 @@
 import sys
-sys.path.append('../exchangeInterface')
+sys.path.append('./exchangeInterface')
 import marketData
 import pandas as pd
 

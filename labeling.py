@@ -1,40 +1,14 @@
-import sys
-sys.path.append('./exchangeInterface')
-
-
-import marketData
-
-import time
 import pandas as pd
 import numpy as np
-import matplotlib.pyplot as plt
-import plotly.graph_objects as go
+from tqdm import tqdm
 
-
-
-
-
-
-
-
-
-
-START = 1580515200 # 01.02.2020
-END = 1583798400 # 10.03.2020
-
-
-
-
-
-
-
-
+historicalDataPath = "historicalData/HistoricalData_BTC_USDT_01072016_01072023_MINUTE_5.csv"
 
 # looks |radius| candles ahead
 def classifyFuture(prices, radius, threshhold=0):
     res = []
-    for i in range(0, len(prices) - radius):
-        pctChangeAvg = np.mean(prices[i+1:i+radius+1]) / prices[i];
+    for i in tqdm(range(0, len(prices) - radius)):
+        pctChangeAvg = np.mean(prices[i+1:i+radius+1]) / prices[i]
         if pctChangeAvg >= 1 + threshhold:
             # future average price higher than current price, buy
             res.append(1)
@@ -55,8 +29,8 @@ def classifyPastFuture(prices, radius, threshhold=0):
     # fill start with zeros
     for i in range(0, radius):
         res.append(0)
-    for i in range(radius, len(prices) - radius):
-        pctChangeAvg = np.mean(prices[i-radius-1:i+radius+1]) / prices[i];
+    for i in tqdm(range(radius, len(prices) - radius)):
+        pctChangeAvg = np.mean(prices[i-radius-1:i+radius+1]) / prices[i]
         if pctChangeAvg >= 1 + threshhold:
             # average price higher than current price, buy
             res.append(1)
@@ -74,7 +48,7 @@ def classifyPastFuture(prices, radius, threshhold=0):
 # target only 1 or 0 if all agree, else 2 (hold)
 def overlap(targetArrays):
     res = []
-    for i in range(0, len(targetArrays[0])):
+    for i in tqdm(range(0, len(targetArrays[0]))):
         allEaqual = True
         for j in range(1, len(targetArrays)):
             if targetArrays[j][i] != targetArrays[0][i]:
@@ -90,71 +64,24 @@ def convertToActionOrHold(targets):
 
 # build classification strategy here
 def classify(prices):
-    res = overlap([classifyFuture(prices, 300, 0.005), classifyPastFuture(prices, 300, 0.005)])
-    #res = overlap([classifyFuture(prices, 40, 0.0004), classifyPastFuture(prices, 40, 0.0004)])
+    res = overlap([classifyFuture(prices, 40, 0.004), classifyPastFuture(prices, 40, 0.004)])
+    #res = overlap([classifyFuture(prices, 40, 0.0005), classifyPastFuture(prices, 40, 0.0005)])
     #res = overlap([classifyFuture(prices, 20), classifyPastFuture(prices, 20)])
-    #res = classifyFuture(prices, 40, 0.0075)
+    #res = classifyPastFuture(prices, 40, 0.0075)
     return res
 
 
 
-# load price data
+# load DF
+print("loading df...")
+main_df = pd.read_csv(historicalDataPath)
+print("done")
+main_df.index = np.arange(0, len(main_df))
+#main_df = main_df.replace([0.0], 0.0001)
 
+# classify every row
+print("classifying...")
+main_df["target"] = classify(main_df[f"close"])
 
-
-df = marketData.getHistoricalData('BTC_USDT', start=START, end=END, candleIntv='MINUTE_5')
-print(df)
-
-
-
-#fig = go.Figure(data=[go.Candlestick(x=df['dt_closeTime'],
-#                       open=df['open'], high=df['high'],
-#                       low=df['close'], close=df['close'])])
-#fig.update_yaxes(fixedrange=False)
-#fig.show()
-
-
-
-
-
-
-
-#prices = getPrices("BTC")
-#prices = [float(price) for price in prices]
-#prices = [round(price, 2) for price in prices]
-
-
-
-
-
-
-
-
-
-
-#
-## get target labels
-#targets = classify(prices)
-#
-#buyPrices = []
-#buyTimes = []
-#sellPrices = []
-#sellTimes = []
-#for i in range(0, len(prices)):
-#    if targets[i] == 1:
-#        # buy
-#        buyPrices.append(prices[i])
-#        buyTimes.append(i)
-#    if targets[i] == 0:
-#        # sell
-#        sellPrices.append(prices[i])
-#        sellTimes.append(i)
-#
-#
-#print("buys:", len(buyTimes), (len(buyTimes)/len(prices))*100, "% , sells:", len(sellTimes), (len(sellTimes)/len(prices))*100, "%")
-#
-#plt.plot(prices)
-#plt.plot(buyTimes, buyPrices, 'go')
-#plt.plot(sellTimes, sellPrices, 'ro')
-#plt.show()
-
+# to csv
+main_df.to_csv("historicalData/labeled/HistoricalDataLabeled_BTC_USDT_01072016_01072023_MINUTE_5_ov40_th04p.csv", index=False)
