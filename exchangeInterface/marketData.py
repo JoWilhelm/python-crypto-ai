@@ -40,7 +40,7 @@ def getHistoricalDataSingleRequest(pairing, start, end, candleIntv):
         columns = ['low', 'high', 'open', 'close', 'amount_quoteUnits', 'quantity_baseUnits', 'buyTakerAmount_quoteUnits', 'buyTakerQuantity_baseUnits', 'tradeCount', 'ts_recordPushed', 'weightedAverage', 'ts_startTime', 'ts_closeTime', 'dt_close']
     """
     # poloniex API request
-    response = client.markets().get_candles(pairing, candleIntv, start_time=start, end_time=end, limit=min(500, int((end-start)/candleIntvSeconds[candleIntv])))
+    response = client.markets().get_candles(pairing, candleIntv, start_time=start*1000, end_time=end*1000, limit=min(500, int((end-start)/candleIntvSeconds[candleIntv])))
     
     df = pd.DataFrame(response, columns=['low', 'high', 'open', 'close', 'amount_quoteUnits', 'quantity_baseUnits', 'buyTakerAmount_quoteUnits', 'buyTakerQuantity_baseUnits', 'tradeCount', 'ts_recordPushed', 'weightedAverage', 'interval', 'ts_openTime', 'ts_closeTime'])
     df.drop('interval', axis=1, inplace=True)
@@ -49,11 +49,16 @@ def getHistoricalDataSingleRequest(pairing, start, end, candleIntv):
     df['ts_closeTime'] = df['ts_closeTime'] / 1000
     df['ts_recordPushed'] = df['ts_recordPushed'] / 1000
 
-    df.apply(pd.to_numeric)
+    df = df.apply(pd.to_numeric)
     
     df['dt_closeTime'] = [datetime.fromtimestamp(ts) for ts in df['ts_closeTime']]
+    
 
     return df
+
+
+#df = getHistoricalDataSingleRequest('BTC_USDT', start=1583798400, end=1583798400+(60*5*100), candleIntv='MINUTE_5')
+#print(df)
 
 
 
@@ -117,8 +122,8 @@ def getHistoricalData(pairing, start, end, candleIntv):
     return df
 
 
-df = getHistoricalData('BTC_USDT', start=1694264564-(60*5*1600), end=1694264564, candleIntv='MINUTE_5')
-print(df)
+#df = getHistoricalData('BTC_USDT', start=1694264564-(60*5*1600), end=1694264564, candleIntv='MINUTE_5')
+#print(df)
 
 
 

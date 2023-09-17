@@ -1,7 +1,22 @@
+import sys
+sys.path.append('./exchangeInterface')
+
+
+import marketData
+
 import time
 import pandas as pd
 import numpy as np
 import matplotlib.pyplot as plt
+import plotly.graph_objects as go
+
+
+
+
+
+
+
+
 
 
 START = 1580515200 # 01.02.2020
@@ -10,52 +25,9 @@ END = 1583798400 # 10.03.2020
 
 
 
-#def getPrices(coin):
-#
-#    START = 1580515200 # 01.02.2020
-#    END = 1583798400 # 10.03.2020
-#
-#
-#    # collect data in 1.5d intervals (the API doesn't allow larger requests)
-#    intervalStart = START
-#    intervalEnd = START + 129600 # +1.5d
-#    intervalsCounter = 1
-#    
-#    
-#    dataset = []
-#    
-#    while(intervalEnd < END):
-#        dataset = np.append(dataset, getPrices_intv("BTC", intervalStart, intervalEnd))
-#        # shift interval
-#        intervalStart = intervalEnd
-#        intervalEnd += 129600 # +1.5d
-#        # counter
-#        print("intervals: ", intervalsCounter, "/", int((END-START)/129600), " len dataset: ", len(dataset))
-#        
-#        if intervalsCounter % 50 == 0:
-#            time.sleep(60)
-#        intervalsCounter += 1
-#    
-#    intervalEnd = END
-#    dataset = np.append(dataset, getPrices_intv("BTC", intervalStart, intervalEnd))
-#
-#    return dataset
-#
-#
-#def getPrices_intv(coin, start, end):
-#    while True:
-#        try:
-#            raw = polo.returnChartData(f"USDT_{coin}", 300, start, end)
-#        except:
-#            print("connection lost, trying again")
-#            time.sleep(60)
-#            pass
-#        else:
-#            # connected
-#            break
-#    df = pd.DataFrame(raw)
-#    prices = df["close"].to_list()
-#    return prices
+
+
+
 
 
 # looks |radius| candles ahead
@@ -130,32 +102,59 @@ def classify(prices):
 
 
 
-prices = getPrices("BTC")
-prices = [float(price) for price in prices]
-prices = [round(price, 2) for price in prices]
-
-# get target labels
-targets = classify(prices)
-
-buyPrices = []
-buyTimes = []
-sellPrices = []
-sellTimes = []
-for i in range(0, len(prices)):
-    if targets[i] == 1:
-        # buy
-        buyPrices.append(prices[i])
-        buyTimes.append(i)
-    if targets[i] == 0:
-        # sell
-        sellPrices.append(prices[i])
-        sellTimes.append(i)
+df = marketData.getHistoricalData('BTC_USDT', start=START, end=END, candleIntv='MINUTE_5')
+print(df)
 
 
-print("buys:", len(buyTimes), (len(buyTimes)/len(prices))*100, "% , sells:", len(sellTimes), (len(sellTimes)/len(prices))*100, "%")
 
-plt.plot(prices)
-plt.plot(buyTimes, buyPrices, 'go')
-plt.plot(sellTimes, sellPrices, 'ro')
-plt.show()
+#fig = go.Figure(data=[go.Candlestick(x=df['dt_closeTime'],
+#                       open=df['open'], high=df['high'],
+#                       low=df['close'], close=df['close'])])
+#fig.update_yaxes(fixedrange=False)
+#fig.show()
+
+
+
+
+
+
+
+#prices = getPrices("BTC")
+#prices = [float(price) for price in prices]
+#prices = [round(price, 2) for price in prices]
+
+
+
+
+
+
+
+
+
+
+#
+## get target labels
+#targets = classify(prices)
+#
+#buyPrices = []
+#buyTimes = []
+#sellPrices = []
+#sellTimes = []
+#for i in range(0, len(prices)):
+#    if targets[i] == 1:
+#        # buy
+#        buyPrices.append(prices[i])
+#        buyTimes.append(i)
+#    if targets[i] == 0:
+#        # sell
+#        sellPrices.append(prices[i])
+#        sellTimes.append(i)
+#
+#
+#print("buys:", len(buyTimes), (len(buyTimes)/len(prices))*100, "% , sells:", len(sellTimes), (len(sellTimes)/len(prices))*100, "%")
+#
+#plt.plot(prices)
+#plt.plot(buyTimes, buyPrices, 'go')
+#plt.plot(sellTimes, sellPrices, 'ro')
+#plt.show()
 
