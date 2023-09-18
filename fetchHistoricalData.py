@@ -14,5 +14,5 @@ dataset["HLPercent"] = (dataset["high"] - dataset["low"]) / dataset["high"]
 
 # print, to csv
 print(dataset)
-dataset.to_csv(f"HistoricalData_{pairing}_01072016_01072023_{candleIntv}.csv", index=False)
+dataset.to_csv(f"historicalData/HistoricalData_{pairing}_01072016_01072023_{candleIntv}.csv", index=False)
 
