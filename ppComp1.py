@@ -16,25 +16,33 @@ VALIDATION_PCT = 0.2
 
 
 
+def preprocess1(df):
+    # before sequencing
 
-def preprocess(dfs):
-    for df in dfs:
-        for col in df.columns:
-            if col != "target":
+    # pct.change transform price columns ('low', 'high', 'open', 'close')
+    # scale every colum (center mean and unit variance)
+
+    for col in df.columns:
+        if col != 'target':
+            if col != 'quantity_baseUnits' and col != 'HLPercent':
                 df[col] = df[col].pct_change()
                 df.dropna(inplace=True)
-                df[col] = preprocessing.scale(df[col].values)
-                df.index = np.arange(0, len(df))
 
-    return dfs
+            df[col] = preprocessing.scale(df[col].values)
+    df.index = np.arange(0, len(df))
+    return df
 
 
-def splitDf(df):
+
+
+
+def splitDf_after(df):
+
     res = []
     print("")
     print("splitDf")
-    while len(df) >= SEQ_LEN + len(df.columns) -1:
-        first = df.head(SEQ_LEN + len(df.columns) -1).copy()
+    while len(df) >= SEQ_LEN:
+        first = df.head(SEQ_LEN).copy()
         first.index = np.arange(0, len(first))
         res.append(first)
         df = df.tail(len(df) - CANDLES_SHIFT)
@@ -49,23 +57,43 @@ def splitDf(df):
 
 
 
+
+
 df = pd.read_csv("historicalData/labeled/HistoricalDataLabeled_BTC_USDT_01072016_01072023_MINUTE_5_ov40_th04p.csv")
 df = df[['low', 'high', 'open', 'close', 'quantity_baseUnits', 'HLPercent']]
-
-df = df.replace(0, 0.00001)
-
-#df = df.tail(1000)
+#df = df.tail(10000)
 print(df)
 
 
+ppDf = preprocess1(df)
+#plt.plot(ppDf['quantity_baseUnits'])
+#plt.show()
 
-splittedDfs = splitDf(df)
-print(splittedDfs[0])
 
-ppDfs = preprocess(splittedDfs)
-print(ppDfs[0])
+# Create subplots in a vertical layout
+fig, axes = plt.subplots(nrows=len(df.columns), ncols=1, figsize=(5, 15))
 
-print(len(ppDfs))
+# If there's only one subplot, axes will not be an array; convert it to an array for consistency
+if not isinstance(axes, (list, np.ndarray)):
+    axes = [axes]
+
+for i, column in enumerate(df.columns):
+    df[column].plot(ax=axes[i])
+    axes[i].set_title(column)
+
+plt.tight_layout()
+plt.show()
+
+
+
+
+
+
+
+
+
+
+#splittedDfsPP = splitDf_after(ppDf)
 
 
 
@@ -73,6 +101,7 @@ print(len(ppDfs))
 #plt.plot(ppDfs[0]['close'])
 #
 #plt.show()
+
 
 
 
