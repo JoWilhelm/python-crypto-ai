@@ -64,7 +64,7 @@ def convertToActionOrHold(targets):
 
 # build classification strategy here
 def classify(prices):
-    res = overlap([classifyFuture(prices, 40, 0.004), classifyPastFuture(prices, 40, 0.004)])
+    res = overlap([classifyFuture(prices, 40, 0.0004), classifyPastFuture(prices, 40, 0.0004)])
     return res
 
 
@@ -81,4 +81,4 @@ print("classifying...")
 main_df["target"] = classify(main_df[f"close"])
 
 # to csv
-main_df.to_csv("historicalData/labeled/HistoricalDataLabeled_BTC_USDT_01072016_01072023_MINUTE_5_ov40_th04p.csv", index=False)
+main_df.to_csv("historicalData/labeled/HistoricalDataLabeled_BTC_USDT_01072016_01072023_MINUTE_5_ov40_th004p.csv", index=False)

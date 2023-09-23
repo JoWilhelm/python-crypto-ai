@@ -81,12 +81,12 @@ splittedDfs = preprocess2(splittedDfs)
 
 
 
-## train val split
-#dfsTraining = splittedDfs[:(int(len(splittedDfs) * (1-VALIDATION_PCT)))].copy()
-#dfsValidation = splittedDfs[(int(len(splittedDfs) * (1-VALIDATION_PCT))):].copy()
-##print(len(dfsTraining))
-##print(len(dfsValidation))
-##print(dfsTraining[0])
+# train val split
+dfsTraining = splittedDfs[:(int(len(splittedDfs) * (1-VALIDATION_PCT)))].copy()
+dfsValidation = splittedDfs[(int(len(splittedDfs) * (1-VALIDATION_PCT))):].copy()
+#print(len(dfsTraining))
+#print(len(dfsValidation))
+#print(dfsTraining[0])
 
 
 
@@ -144,7 +144,7 @@ splittedDfs = preprocess2(splittedDfs)
 
 ## PLOT INDIVIDUAL SEQ
 
-seq = 200000
+seq = 705600
 seqIndx = int(seq / CANDLES_SHIFT)
 
 ## FANCY PLOTS

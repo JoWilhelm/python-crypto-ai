@@ -135,21 +135,22 @@ print("buys:", len(buyTimes), (len(buyTimes)/len(df['close']))*100, "% , sells:"
 # plot
 fig = go.Figure(data=[go.Candlestick(x=df['dt_closeTime'],
                        open=df['open'], high=df['high'],
-                       low=df['close'], close=df['close'])])
+                       low=df['close'], close=df['close'],
+                       name='BTC/USDT 5min candles')])
 
 # Scatter plot overlay for green dots
 fig.add_trace(go.Scatter(x=buyTimes,
                          y=buyPrices,
                          mode='markers',
                          marker=dict(color='green'),
-                         name='Green Dots'))
+                         name='labeled \'buy\''))
 
 # Scatter plot overlay for red dots
 fig.add_trace(go.Scatter(x=sellTimes,
                          y=sellPrices,
                          mode='markers',
                          marker=dict(color='red'),
-                         name='Red Dots'))
+                         name='labeled \'sell\''))
 
 fig.update_yaxes(fixedrange=False)
 fig.show()
