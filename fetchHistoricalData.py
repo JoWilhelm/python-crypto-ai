@@ -10,7 +10,7 @@ end = 1688191200 # 01.07.2023
 candleIntv = 'MINUTE_5'
 
 dataset = marketData.getHistoricalData('BTC_USDT', start=start, end=end, candleIntv='MINUTE_5')
-dataset["HLPercent"] = (dataset["high"] - dataset["low"]) / dataset["high"]
+dataset["hl_percent"] = (dataset["high"] - dataset["low"]) / dataset["high"]
 
 # print, to csv
 print(dataset)

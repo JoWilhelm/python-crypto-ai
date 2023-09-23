@@ -1,49 +1,53 @@
-#import seaborn as sns
-import matplotlib.pyplot as plt
-from matplotlib.animation import FuncAnimation
-
-import pandas as pd
-from sklearn import preprocessing
-from tqdm import tqdm
 import numpy as np
+import pandas as pd
+import matplotlib.pyplot as plt
+from sklearn.preprocessing import StandardScaler
 
 
 
 SEQ_LEN = 180 #240   # how many past candles to use to predict
-CANDLES_SHIFT = 2 #5 # how many candles to shift between sequences
+CANDLES_SHIFT = 10000 #2 #5 # how many candles to shift between sequences
 NAME = "m5_ov40th04p_shift2_seq180"
 VALIDATION_PCT = 0.2
 
 
+# Function to preprocess data
+def preprocess3_train(df):
+    # before sequencing
+    #
+    # log and pctchange transform price columns ('low', 'high', 'open', 'close')
+    # scale every colum (center mean and unit variance)
 
-
-def preprocess(dfs):
-    for df in dfs:
-        for col in df.columns:
-            if col != "target":
+    scaler_dict = {}
+    for col in df.columns:
+        if col != 'target':
+            if col != 'quantity_baseUnits' and col != 'hl_percent':
+                df[col] = np.log(df[col])
                 df[col] = df[col].pct_change()
                 df.dropna(inplace=True)
-                df[col] = preprocessing.scale(df[col].values)
-                df.index = np.arange(0, len(df))
+            scaler = StandardScaler()
+            df[col] = scaler.fit_transform(df[col].values.reshape(-1, 1))
+            scaler_dict[col] = scaler
+    df.index = np.arange(0, len(df))
+    return df, scaler_dict
 
-    return dfs
-
-
-def splitDf(df):
-    res = []
-    print("")
-    print("splitDf")
-    while len(df) >= SEQ_LEN + len(df.columns) -1:
-        first = df.head(SEQ_LEN + len(df.columns) -1).copy()
-        first.index = np.arange(0, len(first))
-        res.append(first)
-        df = df.tail(len(df) - CANDLES_SHIFT)
-        df.index = np.arange(0, len(df))
-
-    print("-done")
-    print("")
-    return res
-
+# Function to apply saved preprocessing to new data
+def apply_preprocess3_val(df, scaler_dict):
+    # before sequencing
+    #
+    # pct.change transform price columns ('low', 'high', 'open', 'close')
+    # scale every colum (center mean and unit variance)
+    
+    for col in df.columns:
+        if col != 'target':
+            if col != 'quantity_baseUnits' and col != 'hl_percent':
+                df[col] = np.log(df[col])
+                df[col] = df[col].pct_change()
+                df.dropna(inplace=True)
+            scaler = scaler_dict[col]
+            df[col] = scaler.transform(df[col].values.reshape(-1, 1))
+    df.index = np.arange(0, len(df))
+    return df
 
 
 def splitDf_new(df):
@@ -64,69 +68,152 @@ def splitDf_new(df):
 
 
 
-import numpy as np
-
-def new_preprocess(df):
-
-    for col in ["BTC_close", "BTC_low", "BTC_high", "BTC_average"]:
-        #print(col)
-        df[col] = np.log(df[col])
-        df[col] = df[col].pct_change()
-        df.dropna(inplace=True)
-        #mean = np.mean(df[col])
-        mean = 0.00000068
-        #std = np.std(df[col])
-        std = 0.00028
-        #print("mean:", mean, ", std:", std)
-        df[col] = (df[col] - mean) / std
-    
-    
-    df["BTC_volume"] = df["BTC_volume"].replace(0, 1)
-    df["BTC_volume"] = np.log(df["BTC_volume"])
-    #df["BTC_volume"] = df["BTC_volume"].pct_change()   # taking the pct change somehow makes it worse
-    #df.dropna(inplace=True)                            # taking the pct change somehow makes it worse
-    #mean = np.mean(df["BTC_volume"])
-    mean = 9.3
-    #std = np.std(df["BTC_volume"])
-    std = 2.82
-    #print("mean:", mean, ", std:", std)
-    df["BTC_volume"] = (df["BTC_volume"] - mean) / std
 
 
-    #mean = np.mean(df["BTC_HLPercent"])
-    mean = 0.0027
-    #std = np.std(df["BTC_HLPercent"])
-    std = 0.0032
-    #print("mean:", mean, ", std:", std)
-    df["BTC_HLPercent"] = (df["BTC_HLPercent"] - mean) / std
-
-
-    return df
-
-
-
-
-
-
-
-
+# load data
 df = pd.read_csv("historicalData/labeled/HistoricalDataLabeled_BTC_USDT_01072016_01072023_MINUTE_5_ov40_th04p.csv")
-df = df[['low', 'high', 'open', 'close', 'quantity_baseUnits', 'HLPercent']]
-
-df = df.replace(0, 0.00001)
-
-#df = df.tail(1000)
+df = df[['close', 'weightedAverage', 'hl_percent', 'quantity_baseUnits']]
+#df = df.tail(5000)
 print(df)
 
 
 
-splittedDfs = splitDf(df)
-print(splittedDfs[0])
+# Split data into train and validation sets
+train_size = int((1-VALIDATION_PCT) * len(df))
+train_df = df.iloc[:train_size].copy()
+val_df = df.iloc[train_size:].copy()
 
-ppDfs = preprocess(splittedDfs)
-print(ppDfs[0])
+# Preprocess the training data and save the scaling parameters
+train_df, scaler_dict = preprocess3_train(train_df)
+# Apply saved preprocessing to validation data
+val_df = apply_preprocess3_val(val_df, scaler_dict)
 
-print(len(ppDfs))
+#
+#
+#
+#train_dfs = splitDf_new(train_df)
+#val_dfs = splitDf_new(val_df)
+#
+#splittedDfs = train_dfs + val_dfs
+#
+
+
+
+
+
+
+
+
+
+
+
+## FANCY PLOTS
+
+# Create subplots in a vertical layout
+fig, axes = plt.subplots(nrows=len(df.columns), ncols=1, figsize=(5, 15))
+
+# If there's only one subplot, axes will not be an array; convert it to an array for consistency
+if not isinstance(axes, np.ndarray):
+    axes = np.array([axes])
+
+# Create x-values for the train and validation data
+train_x = np.arange(len(train_df))
+val_x = np.arange(len(train_df), len(train_df) + len(val_df))
+
+for i, column in enumerate(df.columns):
+    # Plot the train data
+    axes[i].plot(train_x, train_df[column], label='Train')
+    
+    # Plot the validation data right next to the train data
+    axes[i].plot(val_x, val_df[column], label='Validation', color='lightblue')
+    
+    # Add title and legend to each subplot
+    axes[i].set_title(column)
+
+# Create one legend for the entire figure
+handles, labels = axes[i].get_legend_handles_labels()
+fig.legend(handles, labels, loc='upper right')  # You can adjust the 'loc' parameter as needed
+
+# Adjust layout to add vertical white space between subplots
+plt.tight_layout()
+plt.subplots_adjust(hspace=0.3, top=0.92)  # Adjust the vertical spaces between plots and the top margin
+
+plt.show()
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+### PLOT INDIVIDUAL SEQ
+#
+#seq = 100000
+#seqIndx = int(seq / CANDLES_SHIFT)
+#
+### FANCY PLOTS
+#
+## Create subplots in a vertical layout
+#fig, axes = plt.subplots(nrows=len(splittedDfs[seqIndx].columns), ncols=1, figsize=(5, 15))
+#
+## If there's only one subplot, axes will not be an array; convert it to an array for consistency
+#if not isinstance(axes, np.ndarray):
+#    axes = np.array([axes])
+#
+## Create x-values
+#x = np.arange(seq, len(splittedDfs[seqIndx]) + seq)
+#
+#for i, column in enumerate(splittedDfs[seqIndx].columns):
+#
+#    if seq > train_size:
+#        c = 'lightblue'
+#        l = 'Validation'
+#    else:
+#        c = 'tab:blue'
+#        l = 'Train'
+#    # Plot the data
+#    axes[i].plot(x, splittedDfs[seqIndx][column], color=c, label=l)
+#    
+#    # Add title and legend to each subplot
+#    axes[i].set_title(column)
+#
+## Create one legend for the entire figure
+#handles, labels = axes[i].get_legend_handles_labels()
+#fig.legend(handles, labels, loc='upper right')  # You can adjust the 'loc' parameter as needed
+#
+## Adjust layout to add vertical white space between subplots
+#plt.tight_layout()
+#plt.subplots_adjust(hspace=0.3, top=0.92)  # Adjust the vertical spaces between plots and the top margin
+#
+#plt.show()
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 
