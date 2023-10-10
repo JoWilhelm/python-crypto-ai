@@ -20,7 +20,7 @@ import plotly.graph_objects as go
 
 
 START = 1580515200 # 01.02.2020
-END = 1583798400 # 10.03.2020
+END = 	1585692000 # 01.04.2020
 
 
 
@@ -90,8 +90,9 @@ def convertToActionOrHold(targets):
 
 # build classification strategy here
 def classify(prices):
-    #res = overlap([classifyFuture(prices, 300, 0.005), classifyPastFuture(prices, 300, 0.005)])
-    res = overlap([classifyFuture(prices, 40, 0.0004), classifyPastFuture(prices, 40, 0.0004)])
+    res = overlap([classifyFuture(prices, 200, 0.0015), classifyPastFuture(prices, 200, 0.0015)])
+    
+    #res = overlap([classifyFuture(prices, 40, 0.0004), classifyPastFuture(prices, 40, 0.0004)])
     return res
 
 

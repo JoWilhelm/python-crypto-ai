@@ -5,3 +5,4 @@ loss: 'sparse_categorical_crossentropy'
 before overfitting:
 pp1: val_accuracy 0.485, val_loss 1.005  epoch ~50
 pp2: val_accuracy 0.467, val_loss 1.02  epoch ~35
+pp3: val_accuracy 0.489, val_loss 1.001  epoch ~60 same if we include 'low' and 'high'

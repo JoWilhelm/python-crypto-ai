@@ -6,7 +6,7 @@ from sklearn.preprocessing import StandardScaler
 
 
 SEQ_LEN = 180 #240   # how many past candles to use to predict
-CANDLES_SHIFT = 10000 #2 #5 # how many candles to shift between sequences
+CANDLES_SHIFT = 50#2 #5 # how many candles to shift between sequences
 NAME = "m5_ov40th04p_shift2_seq180"
 VALIDATION_PCT = 0.2
 
@@ -88,57 +88,13 @@ train_df, scaler_dict = preprocess3_train(train_df)
 # Apply saved preprocessing to validation data
 val_df = apply_preprocess3_val(val_df, scaler_dict)
 
-#
-#
-#
-#train_dfs = splitDf_new(train_df)
-#val_dfs = splitDf_new(val_df)
-#
-#splittedDfs = train_dfs + val_dfs
-#
 
 
 
+train_dfs = splitDf_new(train_df)
+val_dfs = splitDf_new(val_df)
 
-
-
-
-
-
-
-
-## FANCY PLOTS
-
-# Create subplots in a vertical layout
-fig, axes = plt.subplots(nrows=len(df.columns), ncols=1, figsize=(5, 15))
-
-# If there's only one subplot, axes will not be an array; convert it to an array for consistency
-if not isinstance(axes, np.ndarray):
-    axes = np.array([axes])
-
-# Create x-values for the train and validation data
-train_x = np.arange(len(train_df))
-val_x = np.arange(len(train_df), len(train_df) + len(val_df))
-
-for i, column in enumerate(df.columns):
-    # Plot the train data
-    axes[i].plot(train_x, train_df[column], label='Train')
-    
-    # Plot the validation data right next to the train data
-    axes[i].plot(val_x, val_df[column], label='Validation', color='lightblue')
-    
-    # Add title and legend to each subplot
-    axes[i].set_title(column)
-
-# Create one legend for the entire figure
-handles, labels = axes[i].get_legend_handles_labels()
-fig.legend(handles, labels, loc='upper right')  # You can adjust the 'loc' parameter as needed
-
-# Adjust layout to add vertical white space between subplots
-plt.tight_layout()
-plt.subplots_adjust(hspace=0.3, top=0.92)  # Adjust the vertical spaces between plots and the top margin
-
-plt.show()
+splittedDfs = train_dfs + val_dfs
 
 
 
@@ -151,37 +107,25 @@ plt.show()
 
 
 
-
-
-
-
-### PLOT INDIVIDUAL SEQ
-#
-#seq = 100000
-#seqIndx = int(seq / CANDLES_SHIFT)
-#
 ### FANCY PLOTS
 #
 ## Create subplots in a vertical layout
-#fig, axes = plt.subplots(nrows=len(splittedDfs[seqIndx].columns), ncols=1, figsize=(5, 15))
+#fig, axes = plt.subplots(nrows=len(df.columns), ncols=1, figsize=(5, 15))
 #
 ## If there's only one subplot, axes will not be an array; convert it to an array for consistency
 #if not isinstance(axes, np.ndarray):
 #    axes = np.array([axes])
 #
-## Create x-values
-#x = np.arange(seq, len(splittedDfs[seqIndx]) + seq)
+## Create x-values for the train and validation data
+#train_x = np.arange(len(train_df))
+#val_x = np.arange(len(train_df), len(train_df) + len(val_df))
 #
-#for i, column in enumerate(splittedDfs[seqIndx].columns):
-#
-#    if seq > train_size:
-#        c = 'lightblue'
-#        l = 'Validation'
-#    else:
-#        c = 'tab:blue'
-#        l = 'Train'
-#    # Plot the data
-#    axes[i].plot(x, splittedDfs[seqIndx][column], color=c, label=l)
+#for i, column in enumerate(df.columns):
+#    # Plot the train data
+#    axes[i].plot(train_x, train_df[column], label='Train')
+#    
+#    # Plot the validation data right next to the train data
+#    axes[i].plot(val_x, val_df[column], label='Validation', color='lightblue')
 #    
 #    # Add title and legend to each subplot
 #    axes[i].set_title(column)
@@ -195,6 +139,62 @@ plt.show()
 #plt.subplots_adjust(hspace=0.3, top=0.92)  # Adjust the vertical spaces between plots and the top margin
 #
 #plt.show()
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+## PLOT INDIVIDUAL SEQ
+
+seq = 705600
+seqIndx = int(seq / CANDLES_SHIFT)
+
+## FANCY PLOTS
+
+# Create subplots in a vertical layout
+fig, axes = plt.subplots(nrows=len(splittedDfs[seqIndx].columns), ncols=1, figsize=(5, 15))
+
+# If there's only one subplot, axes will not be an array; convert it to an array for consistency
+if not isinstance(axes, np.ndarray):
+    axes = np.array([axes])
+
+# Create x-values
+x = np.arange(seq, len(splittedDfs[seqIndx]) + seq)
+
+for i, column in enumerate(splittedDfs[seqIndx].columns):
+
+    if seq > train_size:
+        c = 'lightblue'
+        l = 'Validation'
+    else:
+        c = 'tab:blue'
+        l = 'Train'
+    # Plot the data
+    axes[i].plot(x, splittedDfs[seqIndx][column], color=c, label=l)
+    
+    # Add title and legend to each subplot
+    axes[i].set_title(column)
+
+# Create one legend for the entire figure
+handles, labels = axes[i].get_legend_handles_labels()
+fig.legend(handles, labels, loc='upper right')  # You can adjust the 'loc' parameter as needed
+
+# Adjust layout to add vertical white space between subplots
+plt.tight_layout()
+plt.subplots_adjust(hspace=0.3, top=0.92)  # Adjust the vertical spaces between plots and the top margin
+
+plt.show()
 
 
 

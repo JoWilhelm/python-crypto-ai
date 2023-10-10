@@ -7,7 +7,7 @@ from sklearn import preprocessing
 
 
 SEQ_LEN = 180 #240   # how many past candles to use to predict
-CANDLES_SHIFT = 10000#2 #5 # how many candles to shift between sequences
+CANDLES_SHIFT = 50#2 #5 # how many candles to shift between sequences
 NAME = "m5_ov40th04p_shift2_seq180"
 VALIDATION_PCT = 0.2
 
@@ -144,7 +144,7 @@ dfsValidation = splittedDfs[(int(len(splittedDfs) * (1-VALIDATION_PCT))):].copy(
 
 ## PLOT INDIVIDUAL SEQ
 
-seq = 705600
+seq = 107700
 seqIndx = int(seq / CANDLES_SHIFT)
 
 ## FANCY PLOTS

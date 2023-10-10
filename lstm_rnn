@@ -1,0 +1,22 @@
+// LSTM RNN Architecture
+digraph {
+	rankdir=LR
+	Input [label="Input
+180x3" shape=ellipse]
+	LSTM1 [label="LSTM
+180x3 → 180x64" shape=box]
+	LSTM2 [label="LSTM
+180x64 → 64" shape=box]
+	Dropout1 [label=Dropout color=dimgrey fontcolor=dimgrey height=0.3 shape=ellipse width=0.3]
+	Dense1 [label="Dense
+64 → 32" shape=ellipse]
+	Dropout2 [label=Dropout color=dimgrey fontcolor=dimgrey height=0.3 shape=ellipse width=0.3]
+	Output [label="Output
+32 → 3" shape=ellipse]
+	Input -> LSTM1
+	LSTM1 -> LSTM2
+	LSTM2 -> Dropout1
+	Dropout1 -> Dense1
+	Dense1 -> Dropout2
+	Dropout2 -> Output
+}
