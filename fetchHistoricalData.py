@@ -7,9 +7,9 @@ import pandas as pd
 pairing = 'BTC_USDT'
 start = 1467374400 # 01.07.2016
 end = 1688191200 # 01.07.2023
-candleIntv = 'MINUTE_5'
+candleIntv = 'HOUR_2'
 
-dataset = marketData.getHistoricalData('BTC_USDT', start=start, end=end, candleIntv='MINUTE_5')
+dataset = marketData.getHistoricalData('BTC_USDT', start=start, end=end, candleIntv=candleIntv)
 dataset["hl_percent"] = (dataset["high"] - dataset["low"]) / dataset["high"]
 
 # print, to csv

@@ -2,7 +2,7 @@ import pandas as pd
 import numpy as np
 from tqdm import tqdm
 
-historicalDataPath = "historicalData/HistoricalData_BTC_USDT_01072016_01072023_MINUTE_5.csv"
+historicalDataPath = "historicalData/HistoricalData_BTC_USDT_01072016_01072023_MINUTE_30.csv"
 
 # looks |radius| candles ahead
 def classifyFuture(prices, radius, threshhold=0):
@@ -64,7 +64,9 @@ def convertToActionOrHold(targets):
 
 # build classification strategy here
 def classify(prices):
-    res = overlap([classifyFuture(prices, 40, 0.0004), classifyPastFuture(prices, 40, 0.0004)])
+    res = overlap([classifyFuture(prices, 40, 0.0015), classifyPastFuture(prices, 40, 0.0015)])
+    #res = overlap([classifyFuture(prices, 200, 0.0015), classifyPastFuture(prices, 200, 0.0015)])
+    #res = overlap([classifyFuture(prices, 40, 0.0004), classifyPastFuture(prices, 40, 0.0004)])
     return res
 
 
@@ -81,4 +83,4 @@ print("classifying...")
 main_df["target"] = classify(main_df[f"close"])
 
 # to csv
-main_df.to_csv("historicalData/labeled/HistoricalDataLabeled_BTC_USDT_01072016_01072023_MINUTE_5_ov40_th004p.csv", index=False)
+main_df.to_csv("historicalData/labeled/HistoricalDataLabeled_BTC_USDT_01072016_01072023_MINUTE_30_ov40_th015p.csv", index=False)

@@ -6,3 +6,10 @@ before overfitting:
 pp1: val_accuracy 0.485, val_loss 1.005  epoch ~50
 pp2: val_accuracy 0.467, val_loss 1.02  epoch ~35
 pp3: val_accuracy 0.489, val_loss 1.001  epoch ~60 same if we include 'low' and 'high'
+
+
+4 normal (pp3): predicting 40x 30min candles threshhold 0.15%
+seq len 180: val_accuracy 0.463, val_loss 1.018
+
+5 time decay: predicting 40x 30min candles threshhold 0.15%
+seq len 90: val_accuracy 0.477, val_loss 1.019

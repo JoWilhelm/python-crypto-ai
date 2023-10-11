@@ -21,7 +21,7 @@ import plotly.graph_objects as go
 
 START = 1580515200 # 01.02.2020
 END = 	1585692000 # 01.04.2020
-
+candleIntv = 'MINUTE_30'
 
 
 
@@ -90,7 +90,9 @@ def convertToActionOrHold(targets):
 
 # build classification strategy here
 def classify(prices):
-    res = overlap([classifyFuture(prices, 200, 0.0015), classifyPastFuture(prices, 200, 0.0015)])
+    res = overlap([classifyFuture(prices, 40, 0.0015), classifyPastFuture(prices, 40, 0.0015)])
+
+    #res = overlap([classifyFuture(prices, 200, 0.0015), classifyPastFuture(prices, 200, 0.0015)])
     
     #res = overlap([classifyFuture(prices, 40, 0.0004), classifyPastFuture(prices, 40, 0.0004)])
     return res
@@ -101,7 +103,7 @@ def classify(prices):
 
 
 # load price data
-df = marketData.getHistoricalData('BTC_USDT', start=START, end=END, candleIntv='MINUTE_5')
+df = marketData.getHistoricalData('BTC_USDT', start=START, end=END, candleIntv=candleIntv)
 print(df)
 
 
@@ -137,7 +139,7 @@ print("buys:", len(buyTimes), (len(buyTimes)/len(df['close']))*100, "% , sells:"
 fig = go.Figure(data=[go.Candlestick(x=df['dt_closeTime'],
                        open=df['open'], high=df['high'],
                        low=df['close'], close=df['close'],
-                       name='BTC/USDT 5min candles')])
+                       name=f'BTC/USDT {candleIntv} candles')])
 
 # Scatter plot overlay for green dots
 fig.add_trace(go.Scatter(x=buyTimes,
