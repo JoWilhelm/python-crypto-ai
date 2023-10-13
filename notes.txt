@@ -10,6 +10,9 @@ pp3: val_accuracy 0.489, val_loss 1.001  epoch ~60 same if we include 'low' and 
 
 4 normal (pp3): predicting 40x 30min candles threshhold 0.15%
 seq len 180: val_accuracy 0.463, val_loss 1.018
+seq len 500: val_accuracy 0.460, val_loss 1.018
+seq len 90: val_accuracy 0.465, val_loss 1.015
+seq len 50: val_accuracy 0.464, val_loss 1.013
 
 5 time decay: predicting 40x 30min candles threshhold 0.15%
 seq len 90: val_accuracy 0.477, val_loss 1.019
