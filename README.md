@@ -43,5 +43,5 @@ This project applies LSTM RNNs to cryptocurrency trading. It covers the full pip
 
 ## Conclusion
 
-This repository contains an end-to-end project, demonstrating the practical application of machine learning in financial markets. Its modular design—from data acquisition, -preparation and -classification over NN model design and -training to strategy backtesting and live trading—makes it an excellent starting point for your own experimentations in the field.
+This repository is an end-to-end project demonstrating the application of ML in financial markets. Its modular design—from data acquisition, -preparation and -classification over NN model design and -training to strategy backtesting and live trading—makes it an excellent starting point for your own experimentations in the field.
 
